@@ -1,0 +1,108 @@
+
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <title>Roland-Morris 功能障礙問卷</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; max-width: 800px; margin: auto; line-height: 1.6; font-size: 1.2em; }
+        h1, h2 { text-align: center; }
+        .question { margin-bottom: 20px; }
+        .buttons { margin-top: 30px; text-align: center; }
+        .result { font-weight: bold; font-size: 1.4em; text-align: center; margin-top: 30px; }
+        button { padding: 10px 20px; font-size: 1em; margin: 5px; }
+        .language-toggle { position: fixed; top: 10px; right: 10px; }
+    </style>
+</head>
+<body>
+
+<div class="language-toggle">
+    <button onclick="toggleLanguage()">切換語言 / Toggle Language</button>
+</div>
+
+<h1 id="title">Roland-Morris 功能障礙問卷</h1>
+<p id="instructions">請根據你今日嘅情況，回答以下每一項係「係」定「唔係」。</p>
+
+<form id="rmForm">
+</form>
+
+<div class="buttons">
+    <button onclick="calculateScore()">提交 / Submit</button>
+</div>
+
+<div class="result" id="result"></div>
+
+<script>
+    const questions = [
+        "因為我背痛，我唔能夠做我平時喺屋企要做嘅嘢。|Because of my back, I stay at home most of the time.",
+        "我因為背痛企都唔夠耐。|Because of my back, I walk more slowly than usual.",
+        "我因為背痛坐唔耐。|Because of my back, I am not doing any of the jobs that I usually do around the house.",
+        "我背痛時會覺得自己好唔開心。|Because of my back, I use a handrail to get upstairs.",
+        "我一拎重嘢就背痛。|Because of my back, I lie down to rest more often.",
+        "因為背痛，我成日覺得自己好失敗。|Because of my back, I have to hold on to something to get out of a chair.",
+        "我冇以前咁鍾意出街。|Because of my back, I try to get other people to do things for me.",
+        "因為背痛，我好難落樓梯。|I get dressed more slowly than usual because of my back.",
+        "我坐低起身時覺得好困難。|I only stand up for short periods of time because of my back.",
+        "我依家冇以前咁開心。|Because of my back, I try not to bend or kneel down.",
+        "背痛影響到我覺得好辛苦。|I find it difficult to get out of a chair because of my back.",
+        "我唔想其他人知我背痛。|My back is painful almost all the time.",
+        "我覺得我背痛會令我成世人都唔好。|I find it difficult to turn over in bed because of my back.",
+        "背痛影響到我瞓覺。|My appetite is not very good because of my back pain.",
+        "我因為背痛而覺得好煩。|I have trouble putting on my socks or stockings because of my back.",
+        "我做唔到我日常會做嘅活動。|I only walk short distances because of my back pain.",
+        "我驚自己會令背痛惡化，所以唔敢做嘢。|I sleep less well because of my back.",
+        "我成日覺得冇人幫我處理背痛問題。|Because of my back, I keep rubbing or holding my back.",
+        "背痛令我日常生活受好大限制。|Because of my back, I am more irritable and bad tempered with people.",
+        "我背痛時唔想同人講嘢。|My back pain has restricted my social life.",
+        "我覺得我背痛好嚴重。|I get easily tired because of my back.",
+        "我背痛時唔想食嘢。|Because of my back pain, I feel less healthy than I used to be.",
+        "我背痛時連出街都唔想。|Because of my back, I find it difficult to do some of the things I used to do.",
+        "我覺得我背痛已經影響我一世。|My back pain has changed how I see my future."
+    ];
+
+    let currentLang = 'zh';
+
+    function loadQuestions() {
+        const form = document.getElementById('rmForm');
+        form.innerHTML = '';
+        questions.forEach((q, i) => {
+            const [zh, en] = q.split('|');
+            const questionText = (currentLang === 'zh') ? zh : en;
+            form.innerHTML += `
+                <div class="question">
+                    <label>${i + 1}. ${questionText}</label><br/>
+                    <input type="radio" name="q${i}" value="1"> ${currentLang === 'zh' ? '係' : 'Yes'}
+                    <input type="radio" name="q${i}" value="0" checked> ${currentLang === 'zh' ? '唔係' : 'No'}
+                </div>
+            `;
+        });
+        document.getElementById('title').innerText = currentLang === 'zh' ? 'Roland-Morris 功能障礙問卷' : 'Roland-Morris Disability Questionnaire';
+        document.getElementById('instructions').innerText = currentLang === 'zh'
+            ? '請根據你今日嘅情況，回答以下每一項係「係」定「唔係」。'
+            : 'Please answer each question below based on how you feel today.';
+        document.getElementById('result').innerText = '';
+    }
+
+    function toggleLanguage() {
+        currentLang = (currentLang === 'zh') ? 'en' : 'zh';
+        loadQuestions();
+    }
+
+    function calculateScore() {
+        let score = 0;
+        questions.forEach((q, i) => {
+            const selected = document.querySelector(`input[name="q${i}"]:checked`);
+            if (selected && selected.value === '1') score++;
+        });
+        const result = `${currentLang === 'zh' ? '你嘅總分係：' : 'Your total score is: '} ${score} / 24`;
+        const interpretation = (currentLang === 'zh')
+            ? (score <= 5 ? '（輕度功能障礙）' : score <= 13 ? '（中度功能障礙）' : '（嚴重功能障礙）')
+            : (score <= 5 ? '(Mild disability)' : score <= 13 ? '(Moderate disability)' : '(Severe disability)');
+        document.getElementById('result').innerText = result + ' ' + interpretation;
+    }
+
+    loadQuestions();
+</script>
+
+</body>
+</html>
